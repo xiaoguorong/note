@@ -1,0 +1,105 @@
+<template>
+    <div class="waterfall-wrapper">
+      <ul class="left-waterfall" ref="left">
+        <li class="item" v-for="(item, index) in leftItems" v-bind:style=" {height:item.height+'px'}">
+            <img :src="item.cover" style="width:100%;">
+        </li>
+      </ul>
+      <ul class="right-waterfall" ref="right">
+        <li class="item" v-for="(item, index) in rightItems" v-bind:style=" {height:item.height+'px'}">
+            <img :src="item.cover" style="width:100%">
+        </li>
+      </ul>
+    </div>
+  </template>
+  
+  <script>
+  export default {
+    data () {
+      return {
+        data: [],
+        leftItems: [],
+        rightItems: [],
+        page:1
+      }
+    },
+    created(){
+        // this.getData();
+        
+    },
+    mounted () {
+      window.onscroll = () =>{
+                  var scrollTop = document.documentElement.scrollTop||document.body.scrollTop;
+                  
+                  //变量windowHeight是可视区的高度
+                  var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+                  //变量scrollHeight是滚动条的总高度
+                  var scrollHeight = document.documentElement.scrollHeight||document.body.scrollHeight;
+                  if(scrollTop+windowHeight==scrollHeight){
+                  //写后台加载数据的函数
+                      this.$nextTick(()=>{
+                          this.getData();
+                      })
+                     
+                  }
+              };
+      
+    },
+    methods: {
+      updateWaterfall () {
+        const leftHeight = this.$refs.left.clientHeight
+        const rightHeight = this.$refs.right.clientHeight
+    
+        let item = this.data.shift()
+        
+        if (item == null) {
+          return
+        }
+        if (leftHeight <= rightHeight) {
+          this.leftItems.push(item)
+        }
+        else {
+          this.rightItems.push(item)
+        }
+        this.$nextTick(function () {
+          this.updateWaterfall()
+        })
+      },
+      async getData() {
+          var response = await this.$axios.post('/Org/getworklist');
+          
+          if (!this.handleReturn(response)) {
+              this.$vux.toast.text(response.msg, 'top');
+              return;
+          }
+          this.page++;
+          this.data.push(...response.content)
+          this.$nextTick(()=>{
+              this.updateWaterfall()
+          })
+      },
+    }
+  }
+  </script>
+  
+  <style scoped>
+  
+    ul {
+      width: 40%
+    }
+  
+    ul.left-waterfall {
+      float: left;
+    }
+  
+    ul.right-waterfall {
+      float: right;
+    }
+  
+    li.item {
+      width: 100%;
+      background-color: aqua;
+      margin: 10px;
+    }
+  
+  </style>

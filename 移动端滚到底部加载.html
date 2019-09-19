@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    
+        vue加载数据
+        <script>
+            window.onscroll = () =>{
+                this.scrollTop = document.documentElement.scrollTop||document.body.scrollTop;
+                
+                //变量windowHeight是可视区的高度
+                var windowHeight = document.documentElement.clientHeight || document.body.clientHeight;
+                //变量scrollHeight是滚动条的总高度
+                var scrollHeight = document.documentElement.scrollHeight||document.body.scrollHeight;
+                if(this.scrollTop+windowHeight==scrollHeight){
+                //写后台加载数据的函数
+                    this.$nextTick(()=>{
+                        this.getData();
+                    }) 
+                }
+            }
+        </script>
+</body>
+</html>
